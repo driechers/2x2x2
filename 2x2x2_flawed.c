@@ -1,26 +1,15 @@
 #include <stdio.h>
 
+enum face {
+    up,
+    down,
+    left,
+    right,
+    front,
+    back
+};
+
 enum piece {
-    red,
-    orange,
-    yellow,
-    green,
-    blue,
-    white,
-
-    red_green,
-    red_white,
-    red_blue,
-    red_yellow,
-    green_orange,
-    green_white,
-    green_yellow,
-    blue_white,
-    blue_orange,
-    blue_yellow,
-    orange_white,
-    orange_yellow,
-
     red_green_white,
     red_blue_white,
     red_blue_yellow,
@@ -32,26 +21,6 @@ enum piece {
 };
 
 char *piece_names[] = {
-    "red",
-    "orange",
-    "yellow",
-    "green",
-    "blue",
-    "white",
-
-    "red_green",
-    "red_white",
-    "red_blue",
-    "red_yellow",
-    "green_orange",
-    "green_white",
-    "green_yellow",
-    "blue_white",
-    "blue_orange",
-    "blue_yellow",
-    "orange_white",
-    "orange_yellow",
-
     "red_green_white",
     "red_blue_white",
     "red_blue_yellow",
@@ -62,60 +31,40 @@ char *piece_names[] = {
     "orange_green_yellow"
 };
 
+// This is flawed because it only accounds for the position of the piece
+// and does not consider the orientation.
 enum piece pieces[] =
 {
-    red,
-    orange,
-    yellow,
-    green,
-    blue,
-    white,
 
-    red_green,
-    red_white,
-    red_blue,
-    red_yellow,
-    green_orange,
-    green_white,
-    green_yellow,
-    blue_white,
-    blue_orange,
-    blue_yellow,
-    orange_white,
-    orange_yellow,
+   /*
+         red
+       ______
+      /0 /1  /|
+     -------+ |
+    /3  /2 /|/|  blue
+    +--+--+ + |
+    |  |  |/|4|
+    +--+--+ |/
+    |7 |5 |/        // the hidden piece is 6
+    +--+--+
+    */
 
+    // 0
     red_green_white,
+    // 1
     red_blue_white,
+    // ...
     red_blue_yellow,
     red_green_yellow,
     orange_blue_white,
     orange_blue_yellow,
     orange_green_white,
+    // 7
     orange_green_yellow
 };
 
 enum piece pieces_solved[] =
 {
-    red,
-    orange,
-    yellow,
-    green,
-    blue,
-    white,
-
-    red_green,
-    red_white,
-    red_blue,
-    red_yellow,
-    green_orange,
-    green_white,
-    green_yellow,
-    blue_white,
-    blue_orange,
-    blue_yellow,
-    orange_white,
-    orange_yellow,
-
     red_green_white,
     red_blue_white,
     red_blue_yellow,
@@ -126,151 +75,112 @@ enum piece pieces_solved[] =
     orange_green_yellow
 };
 
-// yellow top
-// green front
-// orange right
-
-enum piece *green_face[3][3] =
+enum piece *up_face[2][2] =
 {
-    {&pieces[red_green_yellow], &pieces[green_yellow], &pieces[orange_green_yellow]},
-    {&pieces[red_green], &pieces[green], &pieces[green_orange]},
-    {&pieces[red_green_white], &pieces[green_white], &pieces[orange_green_white]}
+    {&pieces[orange_blue_yellow], &pieces[red_blue_yellow]},
+    {&pieces[orange_blue_white], &pieces[red_blue_white]}
 };
 
-// yellow top
-// blue front
-// red right
-
-enum piece *blue_face[3][3] =
+enum piece *down_face[2][2] = 
 {
-    {&pieces[orange_blue_yellow], &pieces[blue_yellow], &pieces[red_blue_yellow]},
-    {&pieces[blue_orange], &pieces[blue], &pieces[red_blue]},
-    {&pieces[orange_blue_white], &pieces[blue_white], &pieces[red_blue_white]}
+    {&pieces[red_green_yellow], &pieces[orange_green_yellow]},
+    {&pieces[red_green_white], &pieces[orange_green_white]}
 };
 
-// blue top
-// white front
-// red right
-
-enum piece *white_face[3][3] =
+enum piece *left_face[2][2] =
 {
-    {&pieces[orange_blue_white], &pieces[blue_white], &pieces[red_blue_white]},
-    {&pieces[orange_white], &pieces[white], &pieces[red_white]},
-    {&pieces[orange_green_white], &pieces[green_white], &pieces[red_green_white]}
+    {&pieces[orange_blue_white], &pieces[red_blue_white]},
+    {&pieces[orange_green_white], &pieces[red_green_white]}
 };
 
-// blue top
-// orange front
-// white right
-
-enum piece *orange_face[3][3] =
+enum piece *right_face[2][2] =
 {
-    {&pieces[orange_blue_yellow], &pieces[blue_orange], &pieces[orange_blue_white]},
-    {&pieces[orange_yellow], &pieces[orange], &pieces[orange_white]},
-    {&pieces[orange_green_yellow], &pieces[green_orange], &pieces[orange_green_white]}
+    {&pieces[red_blue_yellow], &pieces[orange_blue_yellow]},
+    {&pieces[red_green_yellow], &pieces[orange_green_yellow]}
 };
 
-// blue top
-// red front
-// yellow right
-enum piece *red_face[3][3] =
+enum piece *front_face[2][2] =
 {
-    {&pieces[red_blue_white], &pieces[red_blue], &pieces[red_blue_yellow]},
-    {&pieces[red_white], &pieces[red], &pieces[red_yellow]},
-    {&pieces[red_green_white], &pieces[red_green], &pieces[red_green_yellow]}
+    {&pieces[red_blue_white], &pieces[red_blue_yellow]},
+    {&pieces[red_green_white], &pieces[red_green_yellow]}
 };
 
-// blue top
-// yellow front
-// orange right
-enum piece *yellow_face[3][3] =
+enum piece *back_face[2][2] =
 {
-    {&pieces[red_blue_yellow], &pieces[blue_yellow], &pieces[orange_blue_yellow]},
-    {&pieces[red_yellow], &pieces[yellow], &pieces[orange_yellow]},
-    {&pieces[red_green_yellow], &pieces[green_yellow], &pieces[orange_green_yellow]}
+    {&pieces[orange_blue_yellow], &pieces[orange_blue_white]},
+    {&pieces[orange_green_yellow], &pieces[orange_green_white]}
 };
 
 // return pointer to 2d array of pointers
-enum piece *(*select_face(enum piece face))[3][3]
+enum piece *(*select_face(enum face face))[2][2]
 {
-    enum piece *(*face_arr)[3][3] = &red_face;
+    enum piece *(*face_arr)[2][2] = &up_face;
     switch(face)
     {
-        case red:
-            face_arr = &red_face;
+        case up:
+            face_arr = &up_face;
             break;
-        case orange:
-            face_arr = &orange_face;
+        case down:
+            face_arr = &down_face;
             break;
-        case yellow:
-            face_arr = &yellow_face;
+        case left:
+            face_arr = &left_face;
             break;
-        case green:
-            face_arr = &green_face;
+        case right:
+            face_arr = &right_face;
             break;
-        case blue:
-            face_arr = &blue_face;
+        case front:
+            face_arr = &front_face;
             break;
-        case white:
-            face_arr = &white_face;
+        case back:
+            face_arr = &back_face;
             break;
     }
 
     return face_arr;
 }
 
-void rotate_clock(enum piece face)
+void rotate_clock(enum face face)
 {
-    enum piece *(*face_arr)[3][3] = select_face(face);
+    enum piece *(*face_arr)[2][2] = select_face(face);
 
     enum piece temp = *(*face_arr)[0][0];
 
-    *(*face_arr)[0][0] = *(*face_arr)[2][0];
-    *(*face_arr)[2][0] = *(*face_arr)[2][2];
-    *(*face_arr)[2][2] = *(*face_arr)[0][2];
-    *(*face_arr)[0][2] = temp;
-
-    temp = *(*face_arr)[2][1];
-    *(*face_arr)[2][1] = *(*face_arr)[1][2];
-    *(*face_arr)[1][2] = *(*face_arr)[0][1];
-    *(*face_arr)[0][1] = *(*face_arr)[1][0];
-    *(*face_arr)[1][0] = temp;
+    *(*face_arr)[0][0] = *(*face_arr)[1][0];
+    *(*face_arr)[1][0] = *(*face_arr)[1][1];
+    *(*face_arr)[1][1] = *(*face_arr)[0][1];
+    *(*face_arr)[0][1] = temp;
 }
 
-void rotate_cclock(enum piece face)
+void rotate_cclock(enum face face)
 {
-    enum piece *(*face_arr)[3][3] = select_face(face);
+    enum piece *(*face_arr)[2][2] = select_face(face);
 
-    enum piece temp = *(*face_arr)[0][2];
+    enum piece temp = *(*face_arr)[0][1];
 
-    *(*face_arr)[0][2] = *(*face_arr)[2][2];
-    *(*face_arr)[2][2] = *(*face_arr)[2][0];
-    *(*face_arr)[2][0] = *(*face_arr)[0][0];
+    *(*face_arr)[0][1] = *(*face_arr)[1][1];
+    *(*face_arr)[1][1] = *(*face_arr)[1][0];
+    *(*face_arr)[1][0] = *(*face_arr)[0][0];
     *(*face_arr)[0][0] = temp;
-
-    temp = *(*face_arr)[0][1];
-    *(*face_arr)[0][1] = *(*face_arr)[1][2];
-    *(*face_arr)[1][2] = *(*face_arr)[2][1];
-    *(*face_arr)[2][1] = *(*face_arr)[1][0];
-    *(*face_arr)[1][0] = temp;
 }
 
-void print_face(enum piece face)
+void print_face(enum face face)
 {
-    enum piece *(*face_arr)[3][3] = select_face(face);
+    enum piece *(*face_arr)[2][2] = select_face(face);
 
-    for(int row=0; row < 3; row++) {
-        printf("%20s %14s %20s\n",
+    for(int row=0; row < 2; row++) {
+        printf("%20s %20s\n",
                 piece_names[*(*face_arr)[row][0]],
-                piece_names[*(*face_arr)[row][1]],
-                piece_names[*(*face_arr)[row][2]]
+                piece_names[*(*face_arr)[row][1]]
                 );
     }
 }
 
+// This is flawed because it does not account for different orientations
+// of the cube uaba should solve but it does not.
 int is_solved()
 {
-    for(int i=0; i < 26; i++)
+    for(int i=0; i < 8; i++)
     {
         if(pieces[i] != pieces_solved[i])
             return 0;
@@ -279,31 +189,31 @@ int is_solved()
     return 1;
 }
 
-// example rcbagaoc -> red clock, blue cclock, green cclock, orange clock
+// example ucbadarc -> up clock, back cclock, down cclock, right clock
 
 void play(char *moves)
 {
     for(int i=0; moves[i]; i+=2)
     {
-        enum piece face = red;
+        enum face face = up;
         switch(moves[i]) {
+            case 'u':
+                face = up;
+                break;
+            case 'd':
+                face = down;
+                break;
+            case 'l':
+                face = left;
+                break;
             case 'r':
-                face = red;
+                face = right;
                 break;
-            case 'o':
-                face = orange;
-                break;
-            case 'y':
-                face = yellow;
-                break;
-            case 'g':
-                face = green;
+            case 'f':
+                face = front;
                 break;
             case 'b':
-                face = blue;
-                break;
-            case 'w':
-                face = white;
+                face = back;
                 break;
         }
 
@@ -314,20 +224,23 @@ void play(char *moves)
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    play("rcbcocyagawcyarcbawawagc");
-
-    char buffer[128] = "gawcwcbcraycwagcycoabara";
-
-    play(buffer);
-
-    if(is_solved())
+    if( argc == 2 )
     {
-        printf("solved\n");
+        play(argv[1]);
+
+        if(is_solved())
+        {
+            printf("solved\n");
+            return 0;
+        }
+        else
+        {
+            printf("not solved\n");
+            return 1;
+        }
     }
-    else
-        printf("not solved\n");
 
     return 0;
 }
